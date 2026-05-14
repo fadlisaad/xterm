@@ -18,13 +18,19 @@ A browser-based terminal emulator powered by [xterm.js](https://xtermjs.org/), c
 | WebSocket server | [ws](https://www.npmjs.com/package/ws) |
 | Shell / PTY | [node-pty](https://www.npmjs.com/package/node-pty) |
 
+## Authentication
+
+Access is protected by a password login page. A session cookie is set on successful login and checked on every HTTP request and WebSocket upgrade.
+
+The `PASSWORD` environment variable must be set before starting the server — the server refuses to start without it.
+
 ## Running locally
 
 **Prerequisites:** Node.js, and build tools for node-pty (`python3`, `make`, `g++`).
 
 ```bash
 npm install
-node server.js
+PASSWORD=your-password node server.js
 ```
 
 Open [http://localhost:8080](http://localhost:8080).
@@ -38,7 +44,7 @@ Open [http://localhost:8080](http://localhost:8080).
 
 ```bash
 docker build -t xterm .
-docker run -p 8080:8080 xterm
+docker run -p 8080:8080 -e PASSWORD=your-password xterm
 ```
 
 The Docker image installs and compiles `node-pty` from source, so there are no native module compatibility issues.

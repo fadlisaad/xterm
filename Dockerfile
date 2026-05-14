@@ -10,7 +10,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-COPY index.html server.js ./
+COPY index.html login.html server.js ./
 
 EXPOSE 8080
+ENV PASSWORD=""
 CMD ["node", "server.js"]
