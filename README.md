@@ -48,9 +48,18 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Running with Docker
 
+**With Docker Compose (recommended)** — reads `.env` automatically:
+
+```bash
+cp .env.example .env  # then edit .env with your password
+docker compose up --build
+```
+
+**With plain Docker** — `.env` is not read automatically, pass vars explicitly:
+
 ```bash
 docker build -t xterm .
-docker run -p 3000:3000 -e PASSWORD=your-password xterm
+docker run -p 3000:3000 --env-file .env xterm
 ```
 
 The Docker image installs and compiles `node-pty` from source, so there are no native module compatibility issues.
