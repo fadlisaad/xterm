@@ -22,7 +22,12 @@ A browser-based terminal emulator powered by [xterm.js](https://xtermjs.org/), c
 
 Access is protected by a password login page. A session cookie is set on successful login and checked on every HTTP request and WebSocket upgrade.
 
-The `PASSWORD` environment variable must be set before starting the server — the server refuses to start without it.
+The following environment variables are available:
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `PASSWORD` | Yes | — | Password for the login page. Server refuses to start without it. |
+| `PORT` | No | `3000` | Port the server listens on. |
 
 ## Running locally
 
@@ -30,10 +35,11 @@ The `PASSWORD` environment variable must be set before starting the server — t
 
 ```bash
 npm install
+cp .env.example .env  # then edit .env with your password
 PASSWORD=your-password node server.js
 ```
 
-Open [http://localhost:8080](http://localhost:8080).
+Open [http://localhost:3000](http://localhost:3000).
 
 > **Note:** If `npm install` fails for `node-pty` on a newer Node.js version, force a native compile:
 > ```bash
@@ -44,7 +50,7 @@ Open [http://localhost:8080](http://localhost:8080).
 
 ```bash
 docker build -t xterm .
-docker run -p 8080:8080 -e PASSWORD=your-password xterm
+docker run -p 3000:3000 -e PASSWORD=your-password xterm
 ```
 
 The Docker image installs and compiles `node-pty` from source, so there are no native module compatibility issues.

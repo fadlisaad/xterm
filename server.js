@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const { WebSocketServer } = require('ws');
 const pty = require('node-pty');
 
-const PORT = 8080;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const PASSWORD = process.env.PASSWORD;
 
 if (!PASSWORD) {
