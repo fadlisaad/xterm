@@ -12,6 +12,5 @@ RUN npm ci
 
 COPY index.html login.html server.js ./
 
-EXPOSE 8080
-ENV PASSWORD=""
+EXPOSE 3000
 CMD ["node", "server.js"]
