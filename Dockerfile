@@ -2,7 +2,7 @@ FROM node:22-bookworm-slim
 
 # node-pty requires these to compile its native addon
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 make g++ \
+    python3 make g++ openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

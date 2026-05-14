@@ -21,6 +21,7 @@
         width: 280px;
       }
       h2 { color: #fff; font-size: 1.1rem; margin-bottom: 4px; }
+      label { font-size: 0.8rem; color: #888; margin-bottom: -6px; }
       input {
         padding: 8px 10px;
         background: #2d2d2d;
@@ -41,16 +42,21 @@
         font-family: monospace;
         font-size: 0.95rem;
         cursor: pointer;
+        margin-top: 4px;
       }
       button:hover { background: #444; }
       .error { color: #e06c75; font-size: 0.85rem; }
+      .hint { color: #666; font-size: 0.78rem; }
     </style>
   </head>
   <body>
     <form method="POST" action="/login">
       <h2>Terminal</h2>
+      <label>Host <span class="hint">(leave blank for local shell)</span></label>
+      <input type="text" name="host" placeholder="user@host or user@host:port" autocomplete="off" spellcheck="false" />
+      <label>Password</label>
       <input type="password" name="password" placeholder="Password" autofocus autocomplete="current-password" />
-      <button type="submit">Login</button>
+      <button type="submit">Connect</button>
       <script>
         if (location.search.includes('error=1'))
           document.write('<p class="error">Incorrect password.</p>');

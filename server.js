@@ -42,18 +42,36 @@ function isAuthenticated(req) {
   }
 }
 
+// Returns { cmd, args } for either a local shell or an SSH connection
+function resolveShell(host) {
+  if (!host) {
+    return { cmd: process.env.SHELL || 'bash', args: [] };
+  }
+  // Parse user@host:port — port is optional
+  const portMatch = host.match(/:(\d+)$/);
+  const port = portMatch ? portMatch[1] : null;
+  const target = portMatch ? host.slice(0, -portMatch[0].length) : host;
+  const args = ['-t', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'BatchMode=no'];
+  if (port) args.push('-p', port);
+  args.push(target);
+  return { cmd: 'ssh', args };
+}
+
 const server = http.createServer((req, res) => {
   if (req.url === '/login' || req.url.startsWith('/login?')) {
     if (req.method === 'POST') {
       let body = '';
       req.on('data', chunk => body += chunk);
       req.on('end', () => {
-        const password = new URLSearchParams(body).get('password');
+        const params = new URLSearchParams(body);
+        const password = params.get('password');
         if (password === PASSWORD) {
-          res.writeHead(302, {
-            'Set-Cookie': `session=${VALID_TOKEN}; HttpOnly; SameSite=Strict; Path=/`,
-            'Location': '/',
-          });
+          const host = (params.get('host') || '').trim();
+          const cookies = [
+            `session=${VALID_TOKEN}; HttpOnly; SameSite=Strict; Path=/`,
+            `host=${encodeURIComponent(host)}; HttpOnly; SameSite=Strict; Path=/`,
+          ];
+          res.writeHead(302, { 'Set-Cookie': cookies, 'Location': '/' });
         } else {
           res.writeHead(302, { 'Location': '/login?error=1' });
         }
@@ -84,7 +102,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-// Handle WebSocket upgrades manually so we can auth-gate them
 const wss = new WebSocketServer({ noServer: true });
 
 server.on('upgrade', (req, socket, head) => {
@@ -96,9 +113,12 @@ server.on('upgrade', (req, socket, head) => {
   wss.handleUpgrade(req, socket, head, (ws) => wss.emit('connection', ws, req));
 });
 
-wss.on('connection', (ws) => {
-  const shell = process.env.SHELL || 'bash';
-  const ptyProcess = pty.spawn(shell, [], {
+wss.on('connection', (ws, req) => {
+  const cookies = parseCookies(req.headers.cookie);
+  const host = decodeURIComponent(cookies.host || '');
+  const { cmd, args } = resolveShell(host);
+
+  const ptyProcess = pty.spawn(cmd, args, {
     name: 'xterm-color',
     cols: 80,
     rows: 24,
